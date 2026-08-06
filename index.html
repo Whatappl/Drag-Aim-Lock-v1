@@ -180,8 +180,48 @@
             box-shadow: 0 4px 15px rgba(229, 45, 39, 0.3);
         }
 
+        .btn-genkey {
+            background: linear-gradient(135deg, #8e2de2, #4a00e0);
+            box-shadow: 0 4px 15px rgba(142, 45, 226, 0.3);
+        }
+
+        .btn-verifykey {
+            background: linear-gradient(135deg, #f12711, #f5af19);
+            box-shadow: 0 4px 15px rgba(241, 39, 17, 0.3);
+        }
+
         .btn-action:active {
             transform: scale(0.98);
+        }
+
+        /* Key Input Field */
+        .key-input-container {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .key-input {
+            width: 100%;
+            padding: 14px;
+            background: #080303;
+            border: 1px solid var(--accent-red);
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-align: center;
+            outline: none;
+            text-transform: uppercase;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .key-input::placeholder {
+            color: #664444;
+            font-size: 11px;
+            letter-spacing: 1px;
         }
 
         /* Features Screen */
@@ -483,7 +523,7 @@
             </div>
 
             <div style="font-size: 11px; color: var(--text-muted); text-align: center;">
-                Complete all 3 steps below to unlock controller.
+                Complete steps & generate key to unlock.
             </div>
 
             <div class="step-tracker" id="step-counter">0/3 STEPS</div>
@@ -497,6 +537,17 @@
                 </button>
                 <button onclick="handleStep(3, 'https://whatsapp.com/channel/0029VbD11EtAYlUQxZMuK045/487')" class="btn-action btn-backup">
                     BACKUP CHANNEL
+                </button>
+                <button onclick="generateKey()" class="btn-action btn-genkey" id="genkey-btn">
+                    🔑 GENERATE KEY
+                </button>
+            </div>
+
+            <!-- Key Input Section -->
+            <div class="key-input-container">
+                <input type="text" id="user-key-input" class="key-input" placeholder="ENTER KEY HERE" autocomplete="off" spellcheck="false">
+                <button onclick="verifyKey()" class="btn-action btn-verifykey">
+                    🔓 VERIFY KEY
                 </button>
             </div>
         </div>
@@ -620,6 +671,7 @@
 
     <script>
         let completedSteps = new Set();
+        let generatedKey = "";
 
         function showToast(msg) {
             const toast = document.getElementById("toast-box");
@@ -634,13 +686,52 @@
             completedSteps.add(stepNum);
             document.getElementById('step-counter').innerText = `${completedSteps.size}/3 STEPS`;
             window.open(url, '_blank');
+        }
 
-            if (completedSteps.size === 3) {
+        function generateKey() {
+            if (completedSteps.size < 3) {
+                showToast("Please complete all 3 steps first!");
+                return;
+            }
+
+            const genBtn = document.getElementById('genkey-btn');
+            genBtn.innerText = "GENERATING KEY...";
+            genBtn.disabled = true;
+
+            setTimeout(() => {
+                const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                let randomLetters = "";
+                for (let i = 0; i < 5; i++) {
+                    randomLetters += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                generatedKey = `FEARLESSXIT-${randomLetters}`;
+                
+                // Pre-fill input with generated key and copy to clipboard automatically
+                document.getElementById('user-key-input').value = generatedKey;
+                navigator.clipboard.writeText(generatedKey).catch(() => {});
+                
+                genBtn.innerText = "🔑 GENERATE KEY";
+                genBtn.disabled = false;
+                showToast(`KEY GENERATED: ${generatedKey}`);
+            }, 1500);
+        }
+
+        function verifyKey() {
+            const userInput = document.getElementById('user-key-input').value.trim().toUpperCase();
+
+            if (!generatedKey) {
+                showToast("Generate a key first!");
+                return;
+            }
+
+            if (userInput === generatedKey) {
+                showToast("KEY VERIFIED! ACCESS GRANTED");
                 setTimeout(() => {
                     document.getElementById('verification-panel').classList.add('hidden');
                     document.getElementById('dashboard-panel').classList.remove('hidden');
-                    showToast("Verification Passed! Welcome.");
                 }, 1000);
+            } else {
+                showToast("INVALID KEY!");
             }
         }
 
@@ -705,7 +796,6 @@
                     clearInterval(interval);
                     setTimeout(() => {
                         modal.style.display = 'none';
-                        // Direct deep-link launching Garena Free Fire immediately
                         window.location.href = "intent://launch/#Intent;package=com.dts.freefireth;scheme=android-app;end";
                     }, 1000);
                 }
@@ -714,3 +804,4 @@
     </script>
 </body>
 </html>
+
