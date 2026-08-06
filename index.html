@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -173,6 +174,7 @@
         .btn-tg {
             background: linear-gradient(135deg, #0088cc, #005588);
             box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
+            position: relative;
         }
 
         .btn-backup {
@@ -194,11 +196,8 @@
             transform: scale(0.98);
         }
 
-        /* Key Input Field Container */
+        /* Key Screen Input Container */
         .key-input-container {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px dashed var(--border-color);
             display: flex;
             flex-direction: column;
             gap: 14px;
@@ -517,7 +516,7 @@
             <div class="sub-status">SECURE ACCESS • VERIFICATION REQUIRED</div>
         </div>
 
-        <!-- Verification Panel -->
+        <!-- 1. Channel Verification Panel -->
         <div id="verification-panel" class="card">
             <div class="card-header">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -525,26 +524,37 @@
             </div>
 
             <div style="font-size: 11px; color: var(--text-muted); text-align: center;">
-                Join all channels below to reveal the key section.
+                Join required channels below to continue.
             </div>
 
-            <div class="step-tracker" id="step-counter">0/3 STEPS</div>
+            <div class="step-tracker" id="step-counter">0/2 STEPS</div>
 
             <!-- Join Buttons -->
             <div class="btn-group">
                 <button onclick="handleStep(1, 'https://whatsapp.com/channel/0029VbDIkfX3GJOotlw08M3E')" class="btn-action btn-wa">
                     JOIN WHATSAPP
                 </button>
-                <button onclick="handleStep(2, 'https://t.me/+DX2nYRl0Q6tiZjc1')" class="btn-action btn-tg">
-                    JOIN TELEGRAM
+                <button onclick="handleTelegram('https://t.me/+DX2nYRl0Q6tiZjc1')" class="btn-action btn-tg">
+                    JOIN TELEGRAM <span style="font-size: 9px; opacity: 0.8;">(OPTIONAL)</span>
                 </button>
-                <button onclick="handleStep(3, 'https://whatsapp.com/channel/0029VbD11EtAYlUQxZMuK045/487')" class="btn-action btn-backup">
+                <button onclick="handleStep(2, 'https://whatsapp.com/channel/0029VbD11EtAYlUQxZMuK045/487')" class="btn-action btn-backup">
                     BACKUP CHANNEL
                 </button>
             </div>
+        </div>
 
-            <!-- Key Section (Hidden until all 3 steps completed) -->
-            <div id="key-section" class="key-input-container hidden">
+        <!-- 2. Key Generation & Verification Panel (Separate New Screen) -->
+        <div id="key-panel" class="card hidden">
+            <div class="card-header">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.778-7.778zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                AUTHENTICATION KEY
+            </div>
+
+            <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 20px;">
+                Generate your key and verify access to proceed.
+            </div>
+
+            <div class="key-input-container">
                 <button onclick="generateKey()" class="btn-action btn-genkey" id="genkey-btn">
                     🔑 GENERATE KEY
                 </button>
@@ -555,7 +565,7 @@
             </div>
         </div>
 
-        <!-- Dashboard Panel (Locked by default) -->
+        <!-- 3. Dashboard Panel (Locked by default) -->
         <div id="dashboard-panel" class="card hidden">
             <div class="card-header" style="justify-content: space-between;">
                 <span style="display: flex; align-items: center; gap: 8px;">
@@ -687,24 +697,25 @@
 
         function handleStep(stepNum, url) {
             completedSteps.add(stepNum);
-            document.getElementById('step-counter').innerText = `${completedSteps.size}/3 STEPS`;
+            document.getElementById('step-counter').innerText = `${completedSteps.size}/2 STEPS`;
             window.open(url, '_blank');
 
-            // Show key section only after joining all 3 channels
-            if (completedSteps.size === 3) {
+            // Switch to Key Screen after completing both mandatory steps
+            if (completedSteps.size === 2) {
                 setTimeout(() => {
-                    document.getElementById('key-section').classList.remove('hidden');
-                    showToast("Steps completed! Key generation unlocked.");
+                    document.getElementById('verification-panel').classList.add('hidden');
+                    document.getElementById('key-panel').classList.remove('hidden');
+                    showToast("Steps completed! Opening key screen...");
                 }, 800);
             }
         }
 
-        function generateKey() {
-            if (completedSteps.size < 3) {
-                showToast("Please complete all 3 steps first!");
-                return;
-            }
+        function handleTelegram(url) {
+            window.open(url, '_blank');
+            showToast("Telegram is optional!");
+        }
 
+        function generateKey() {
             const genBtn = document.getElementById('genkey-btn');
             genBtn.innerText = "GENERATING KEY...";
             genBtn.disabled = true;
@@ -738,7 +749,7 @@
             if (userInput === generatedKey) {
                 showToast("KEY VERIFIED! ACCESS GRANTED");
                 setTimeout(() => {
-                    document.getElementById('verification-panel').classList.add('hidden');
+                    document.getElementById('key-panel').classList.add('hidden');
                     document.getElementById('dashboard-panel').classList.remove('hidden');
                 }, 1000);
             } else {
