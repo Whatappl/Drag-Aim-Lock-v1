@@ -194,12 +194,14 @@
             transform: scale(0.98);
         }
 
-        /* Key Input Field */
+        /* Key Input Field Container */
         .key-input-container {
-            margin-top: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border-color);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 14px;
         }
 
         .key-input {
@@ -523,11 +525,12 @@
             </div>
 
             <div style="font-size: 11px; color: var(--text-muted); text-align: center;">
-                Complete steps & generate key to unlock.
+                Join all channels below to reveal the key section.
             </div>
 
             <div class="step-tracker" id="step-counter">0/3 STEPS</div>
 
+            <!-- Join Buttons -->
             <div class="btn-group">
                 <button onclick="handleStep(1, 'https://whatsapp.com/channel/0029VbDIkfX3GJOotlw08M3E')" class="btn-action btn-wa">
                     JOIN WHATSAPP
@@ -538,13 +541,13 @@
                 <button onclick="handleStep(3, 'https://whatsapp.com/channel/0029VbD11EtAYlUQxZMuK045/487')" class="btn-action btn-backup">
                     BACKUP CHANNEL
                 </button>
+            </div>
+
+            <!-- Key Section (Hidden until all 3 steps completed) -->
+            <div id="key-section" class="key-input-container hidden">
                 <button onclick="generateKey()" class="btn-action btn-genkey" id="genkey-btn">
                     🔑 GENERATE KEY
                 </button>
-            </div>
-
-            <!-- Key Input Section -->
-            <div class="key-input-container">
                 <input type="text" id="user-key-input" class="key-input" placeholder="ENTER KEY HERE" autocomplete="off" spellcheck="false">
                 <button onclick="verifyKey()" class="btn-action btn-verifykey">
                     🔓 VERIFY KEY
@@ -686,6 +689,14 @@
             completedSteps.add(stepNum);
             document.getElementById('step-counter').innerText = `${completedSteps.size}/3 STEPS`;
             window.open(url, '_blank');
+
+            // Show key section only after joining all 3 channels
+            if (completedSteps.size === 3) {
+                setTimeout(() => {
+                    document.getElementById('key-section').classList.remove('hidden');
+                    showToast("Steps completed! Key generation unlocked.");
+                }, 800);
+            }
         }
 
         function generateKey() {
@@ -706,7 +717,7 @@
                 }
                 generatedKey = `FEARLESSXIT-${randomLetters}`;
                 
-                // Pre-fill input with generated key and copy to clipboard automatically
+                // Pre-fill input field with the generated key and copy to clipboard
                 document.getElementById('user-key-input').value = generatedKey;
                 navigator.clipboard.writeText(generatedKey).catch(() => {});
                 
@@ -804,4 +815,3 @@
     </script>
 </body>
 </html>
-
