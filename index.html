@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRAG AIM LOCK V1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #080202;
+            --card-bg: #120808;
+            --accent-red: #ff1e27;
+            --accent-red-glow: rgba(255, 30, 39, 0.4);
+            --accent-green: #00e676;
+            --accent-green-glow: rgba(0, 230, 118, 0.4);
+            --accent-blue: #00b0ff;
+            --text-main: #ffffff;
+            --text-muted: #a08888;
+            --border-color: #2a1212;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Orbitron', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(255, 30, 39, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 50% 80%, rgba(20, 5, 5, 0.8) 0%, transparent 80%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 10px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Header Frame */
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+        }
+
+        .avatar-frame {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-red);
+            box-shadow: 0 0 15px var(--accent-red-glow);
+            padding: 3px;
+            background: #000;
+        }
+
+        .avatar-frame img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .title-subtitle {
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: var(--accent-red);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .main-title {
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .main-title span {
+            color: var(--accent-red);
+            text-shadow: 0 0 12px var(--accent-red-glow);
+        }
+
+        .sub-status {
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-top: -4px;
+        }
+
+        /* Card Panels */
+        .card {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        /* Verification Screen */
+        .step-tracker {
+            text-align: center;
+            font-size: 13px;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            margin: 15px 0 20px 0;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 16px;
+            border-radius: 10px;
+            border: none;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-wa {
+            background: linear-gradient(135deg, #00b09b, #96c93d);
+            box-shadow: 0 4px 15px rgba(0, 176, 155, 0.3);
+        }
+
+        .btn-tg {
+            background: linear-gradient(135deg, #0088cc, #005588);
+            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
+        }
+
+        .btn-backup {
+            background: linear-gradient(135deg, #e52d27, #b31217);
+            box-shadow: 0 4px 15px rgba(229, 45, 39, 0.3);
+        }
+
+        .btn-action:active {
+            transform: scale(0.98);
+        }
+
+        /* Features Screen */
+        .notice-box {
+            background: rgba(255, 30, 39, 0.08);
+            border: 1px solid rgba(255, 30, 39, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #ffb3b3;
+        }
+
+        .file-links {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-file {
+            flex: 1;
+            padding: 10px;
+            background: #1a0d0d;
+            border: 1px solid var(--accent-red);
+            color: #fff;
+            font-size: 10px;
+            border-radius: 6px;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .status-badge {
+            color: var(--accent-green);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .control-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .icon-shape {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Switch Styling */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 28px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #261616;
+            transition: .3s;
+            border-radius: 30px;
+            border: 1px solid #3d2020;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #665050;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: rgba(0, 230, 118, 0.2);
+            border-color: var(--accent-green);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+            background-color: var(--accent-green);
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+
+        /* Slider Styling */
+        .slider-container {
+            margin: 25px 0;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-bottom: 10px;
+            color: var(--accent-red);
+        }
+
+        .range-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #261616;
+            outline: none;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--accent-red);
+        }
+
+        .btn-save {
+            background: transparent;
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            margin-bottom: 12px;
+        }
+
+        .btn-launch {
+            background: linear-gradient(135deg, var(--accent-red), #990000);
+            box-shadow: 0 4px 15px var(--accent-red-glow);
+        }
+
+        /* Netlify Terminal Overlay */
+        .terminal-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 100;
+            padding: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .terminal-box {
+            width: 100%;
+            max-width: 500px;
+            background: #050505;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 11px;
+            color: #00ff00;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 0 20px rgba(0,255,0,0.2);
+        }
+
+        .terminal-line {
+            margin-bottom: 6px;
+            word-break: break-all;
+        }
+
+        .footer {
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .footer span {
+            color: var(--accent-red);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="avatar-frame">
+                <img src="https://cdn.phototourl.com/free/2026-08-06-d1c18689-5ee6-47d2-bece-0c7e3fad16d3.png" alt="Profile">
+            </div>
+            <div class="title-subtitle">⚡ FEARLESS NETWORK ⚡</div>
+            <div class="main-title">DRAG AIM <span>LOCK V1</span></div>
+            <div class="sub-status">SECURE ACCESS • VERIFICATION REQUIRED</div>
+        </div>
+
+        <!-- Verification Panel -->
+        <div id="verification-panel" class="card">
+            <div class="card-header">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                VERIFICATION REQUIRED
+            </div>
+
+            <div style="font-size: 11px; color: var(--text-muted); text-align: center;">
+                Complete all 3 steps below to unlock controller.
+            </div>
+
+            <div class="step-tracker" id="step-counter">0/3 STEPS</div>
+
+            <div class="btn-group">
+                <button onclick="handleStep(1, 'https://whatsapp.com/channel/0029VbDIkfX3GJOotlw08M3E')" class="btn-action btn-wa">
+                    JOIN WHATSAPP
+                </button>
+                <button onclick="handleStep(2, 'https://t.me/+DX2nYRl0Q6tiZjc1')" class="btn-action btn-tg">
+                    JOIN TELEGRAM
+                </button>
+                <button onclick="handleStep(3, 'https://whatsapp.com/channel/0029VbD11EtAYlUQxZMuK045/487')" class="btn-action btn-backup">
+                    BACKUP CHANNEL
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Panel (Locked by default) -->
+        <div id="dashboard-panel" class="card hidden">
+            <div class="card-header" style="justify-content: space-between;">
+                <span style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    ACCESS GRANTED
+                </span>
+                <span class="status-badge"><div class="status-dot"></div> ACTIVE</span>
+            </div>
+
+            <div class="notice-box">
+                ⚠️ <strong>IMPORTANT:</strong> Download and setup the required configuration file before applying commands!
+            </div>
+
+            <div class="file-links">
+                <a href="https://www.mediafire.com/file/2lzmw9jjet570us/DRAG_AIM_LOCK_%25F0%259F%258E%25AF%25F0%259F%2594%25A5%2528100%2525_safe%2529.zip/file" target="_blank" class="btn-file">
+                    📥 DOWNLOAD FILE
+                </a>
+                <a href="https://whatsapp.com/channel/0029Vb8dD7a5q08gPKk13w2R/154" target="_blank" class="btn-file">
+                    ▶️ SETUP VIDEO
+                </a>
+            </div>
+
+            <!-- Controls -->
+            <div class="control-row">
+                <div class="control-label">
+                    <div class="icon-shape">🎯</div>
+                    DRAG AIM HEAD (SAFE)
+                </div>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="control-row">
+                <div class="control-label">
+                    <div class="icon-shape">🎯</div>
+                    DRAG AIM NECK (SAFE)
+                </div>
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="control-row">
+                <div class="control-label">
+                    <div class="icon-shape">🛡️</div>
+                    DRAG AIM SAFE (SAFE)
+                </div>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="control-row">
+                <div class="control-label">
+                    <div class="icon-shape">⚡</div>
+                    SPEED (RISK)
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="speed-risk-switch" onchange="handleRiskSpeed(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- Speed Range -->
+            <div class="slider-container">
+                <div class="slider-header">
+                    <span>⚠️ RISK</span>
+                    <span>ENABLES RISK MODE</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span style="font-size: 10px; color: var(--text-muted);">1.0X</span>
+                    <input type="range" min="1" max="5" step="0.1" value="3.0" class="range-slider" id="speed-range" oninput="updateSpeedVal(this.value)">
+                    <span style="font-size: 10px; color: var(--text-muted); width: 35px;" id="speed-val">3.0X</span>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button onclick="saveFunction()" class="btn-action btn-save">
+                    💾 SAVE FUNCTION
+                </button>
+                <button onclick="launchFreeFire()" class="btn-action btn-launch">
+                    🚀 LAUNCH FREE FIRE
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            DEVELOPER: <span>FEARLESS XIT</span><br>
+            <span style="font-size: 8px; color: #555; margin-top: 4px; display: block;">DEV FEARLESS XIT GOT YOU COVERED</span>
+        </div>
+    </div>
+
+    <!-- Terminal Overlay for Launching -->
+    <div id="terminal-modal" class="terminal-modal">
+        <div class="terminal-box" id="terminal-output">
+            <!-- Dynamic Deployment Logs Go Here -->
+        </div>
+    </div>
+
+    <script>
+        let completedSteps = new Set();
+
+        function handleStep(stepNum, url) {
+            completedSteps.add(stepNum);
+            document.getElementById('step-counter').innerText = `${completedSteps.size}/3 STEPS`;
+            window.open(url, '_blank');
+
+            if (completedSteps.size === 3) {
+                setTimeout(() => {
+                    document.getElementById('verification-panel').classList.add('hidden');
+                    document.getElementById('dashboard-panel').classList.remove('hidden');
+                }, 1000);
+            }
+        }
+
+        function handleRiskSpeed(checkbox) {
+            if (checkbox.checked) {
+                alert("Coming soon! Redirecting to main channel...");
+                checkbox.checked = false;
+                window.open("https://whatsapp.com/channel/0029VbDIkfX3GJOotlw08M3E", "_blank");
+            }
+        }
+
+        function updateSpeedVal(val) {
+            document.getElementById('speed-val').innerText = parseFloat(val).toFixed(1) + "X";
+        }
+
+        function saveFunction() {
+            alert("Settings saved successfully!");
+        }
+
+        function launchFreeFire() {
+            const modal = document.getElementById('terminal-modal');
+            const output = document.getElementById('terminal-output');
+            modal.style.display = 'flex';
+            output.innerHTML = '';
+
+            const logs = [
+                "==========================================",
+                " OPTIMIZACIÓN + INYECCIÓN DNS @FearlessXit",
+                "==========================================",
+                "Aplicando DNS @FearlessXit...",
+                " -> setprop net.dns1 1.1.1.1",
+                " -> setprop net.dns2 1.0.0.1",
+                " -> DNS aplicados correctamente.",
+                "==========================================",
+                " Optimizando Wi-Fi y Ping...",
+                " -> Antena Wi-Fi forzada al máximo rendimiento.",
+                "==========================================",
+                " Optimizando Respuesta Táctil y Fluidez...",
+                " -> Sensibilidad y velocidad aceleradas.",
+                "==========================================",
+                " ACTIVANDO SENSI ASTRO ⚙️",
+                " MEJORANDO CALIBRACIÓN ⚙️",
+                " INYECTANDO SENSIBILIDAD 🇧🇷",
+                " Potencia aplicada: 98% [██████████] 98%",
+                "==========================================",
+                " ¡TODO APLICADO EXITOSAMENTE POR FEARLESS XIT!",
+                " ABRIENDO FF ⛩️"
+            ];
+
+            let index = 0;
+            const interval = setInterval(() => {
+                if (index < logs.length) {
+                    const line = document.createElement('div');
+                    line.className = 'terminal-line';
+                    line.innerText = logs[index];
+                    output.appendChild(line);
+                    output.scrollTop = output.scrollHeight;
+                    index++;
+                } else {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        // Attempt to launch Free Fire via intent URL scheme
+                        window.location.href = "intent://launch/#Intent;package=com.dts.freefireth;scheme=android-app;end";
+                        
+                        setTimeout(() => {
+                            alert("If Free Fire did not open automatically, please open Free Fire manually from your home screen.");
+                        }, 1500);
+                    }, 1000);
+                }
+            }, 180);
+        }
+    </script>
+</body>
+</html>
